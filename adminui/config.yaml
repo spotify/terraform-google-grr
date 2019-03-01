@@ -1,0 +1,37 @@
+---
+# Admin UI
+AdminUI.url: "https://%(EXTERNAL_HOSTNAME|env):%(ADMINUI_PORT|env)"
+AdminUI.port: "%(ADMINUI_PORT|env)"
+Client.executable_signing_public_key: "%(%(FRONTEND_PUBLIC_SIGNING_KEY_PATH|env)|file)"
+
+# Use IAP Auth
+AdminUI.webauth_manager: "%(ADMINUI_WEBAUTH_MANAGER|env)"
+AdminUI.google_cloud_project_id: "%(CLOUD_PROJECT_ID|env)"
+AdminUI.google_cloud_backend_service_id: "%(CLOUD_BACKEND_SERVICE_ID|env)"
+
+# We initialize via config file and not grr_config_updater
+Server.initialized: True
+
+# MySQL Credentials
+Datastore.implementation: MySQLAdvancedDataStore
+Mysql.host: "%(MYSQL_HOST|env)"
+Mysql.port: "%(MYSQL_PORT|env)"
+Mysql.database_name: "%(MYSQL_DATABASE_NAME|env)"
+Mysql.database_username: "%(MYSQL_DATABASE_USERNAME|env)"
+Mysql.database_password: "%(MYSQL_DATABASE_PASSWORD|env)"
+
+# Health Checking
+Monitoring.http_port: "%(MONITORING_HTTP_PORT|env)"
+
+# https://github.com/google/grr/blob/a040f75dd4d121ecabf69353e60950eda3d00108/grr/core/install_data/etc/grr-server.yaml#L32
+AdminUI Context:
+  Monitoring.http_port: "%(MONITORING_HTTP_PORT|env)"
+
+# Logging
+Logging.path: /var/log/grr/
+Logging.verbose: True
+
+# Location of the Frontend
+Frontend.bind_address: "%(FRONTEND_BIND_ADDRESS|env)"
+Frontend.bind_port: "%(FRONTEND_BIND_PORT|env)"
+Frontend.certificate: "%(FRONTEND_CERTIFICATE|env)"
