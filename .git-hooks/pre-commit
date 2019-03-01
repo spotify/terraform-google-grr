@@ -1,0 +1,49 @@
+#  Copyright 2018-2019 Spotify AB.
+#  
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#  
+#      http://www.apache.org/licenses/LICENSE-2.0
+#  
+#  Unless required by applicable law or agreed to in writing,
+#  software distributed under the License is distributed on an
+#  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#  KIND, either express or implied.  See the License for the
+#  specific language governing permissions and limitations
+#  under the License.
+
+#!/bin/bash
+command -v terraform > /dev/null 2>&1
+
+# terraform is not installed and we can't do fmt checking
+if [ $? -gt 0 ]
+  then
+    exit 0
+fi
+
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+END_COLOR='\033[0m'
+
+script_dir=$(dirname $0)
+tf_src_dir="$script_dir/../"
+
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+tf_file_count=$( grep '.tf$' <<< $staged | tr ' ' '\n' |  wc -l )
+
+if [ $tf_file_count -gt 0 ]
+  then
+    need_fmt_count=$(terraform fmt -list=true -write=false $tf_src_dir | \
+      wc -l
+    )
+
+    if [ $need_fmt_count -gt 0 ]
+      then
+        echo -e "${RED}Some terraform files are not properly formatted.${END_COLOR}"
+        echo "You can automatically fix formatting by running from project root:"
+        echo -e "${YELLOW}\$ terraform fmt ./terraform${END_COLOR}"
+        echo -e "\nBe sure to ${YELLOW}git add${END_COLOR} again!"
+        exit 1
+    fi
+fi
