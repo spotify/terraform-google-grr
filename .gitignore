@@ -1,0 +1,12 @@
+# Mac
+*.DS_Store
+
+# Compiled files
+*.tfstate
+*.tfstate.backup
+
+# Module directory
+.terraform/
+
+# Installers
+test/installers/*
