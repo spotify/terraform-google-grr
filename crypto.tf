@@ -1,0 +1,82 @@
+variable "grr_ca_cn" {
+  description = "Common name for internal CA"
+}
+
+variable "frontend_cn" {
+  description = "Common name to use frotend certificate"
+}
+
+variable "grr_ca_org" {
+  description = "Organization for internal CA"
+}
+
+variable "grr_ca_country" {
+  description = "Country for internal CA"
+}
+
+variable "frontend_rsa_key_length" {
+  default = 2048
+}
+
+data "tls_public_key" "frontend_executable_signing" {
+  private_key_pem = "${tls_private_key.frontend_executable_signing.private_key_pem}"
+}
+
+resource "tls_private_key" "frontend" {
+  algorithm = "RSA"
+  rsa_bits  = "${var.frontend_rsa_key_length}"
+}
+
+resource "tls_private_key" "frontend_ca" {
+  algorithm = "RSA"
+  rsa_bits  = "${var.frontend_rsa_key_length}"
+}
+
+resource "tls_private_key" "frontend_executable_signing" {
+  algorithm = "RSA"
+  rsa_bits  = "${var.frontend_rsa_key_length}"
+}
+
+resource "tls_self_signed_cert" "frontend_ca" {
+  key_algorithm         = "${tls_private_key.frontend_ca.algorithm}"
+  private_key_pem       = "${tls_private_key.frontend_ca.private_key_pem}"
+  is_ca_certificate     = true
+  validity_period_hours = "${365 * 3 * 24}"
+
+  subject {
+    common_name  = "${var.grr_ca_cn}"
+    organization = "${var.grr_ca_org}"
+    country      = "${var.grr_ca_country}"
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+  ]
+}
+
+resource "tls_cert_request" "frontend_csr" {
+  key_algorithm   = "${tls_private_key.frontend.algorithm}"
+  private_key_pem = "${tls_private_key.frontend.private_key_pem}"
+
+  subject {
+    common_name  = "${var.frontend_cn}"
+    organization = "${var.grr_ca_org}"
+    country      = "${var.grr_ca_country}"
+  }
+}
+
+resource "tls_locally_signed_cert" "frontend" {
+  cert_request_pem   = "${tls_cert_request.frontend_csr.cert_request_pem}"
+  ca_key_algorithm   = "${tls_private_key.frontend_ca.algorithm}"
+  ca_private_key_pem = "${tls_private_key.frontend_ca.private_key_pem}"
+  ca_cert_pem        = "${tls_self_signed_cert.frontend_ca.cert_pem}"
+
+  validity_period_hours = "${365 * 2 * 24}"
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+  ]
+}
