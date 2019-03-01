@@ -1,0 +1,103 @@
+---
+version: "3.7"
+
+networks:
+  grr:
+    driver: bridge
+    name: grr
+
+services:
+  mysql:
+    image: mysql:5.7
+    command: "--max_allowed_packet=1073741824"
+    networks:
+      - grr
+    ports:
+      - "5555:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: grr
+      MYSQL_PASSWORD: grr
+      MYSQL_DATABASE: grr
+    container_name: mysql
+
+  worker:
+    depends_on:
+      - mysql
+    build:
+      context: ./worker
+    image: grr-worker
+    container_name: grr-worker
+    networks:
+      - grr
+    ports:
+      - "4444"
+    env_file:
+      - ./test/worker-keys.env
+    environment:
+      DISABLE_INTERNAL_MYSQL: 'true'
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE_NAME: grr
+      MYSQL_DATABASE_USERNAME: grr
+      MYSQL_DATABASE_PASSWORD: grr
+      MONITORING_HTTP_PORT: 4444
+
+  frontend:
+    depends_on: 
+      - mysql
+    build:
+      context: ./frontend
+    image: grr-frontend
+    container_name: grr-frontend
+    volumes:
+      - type: bind
+        source: ./test/installers
+        target: /usr/share/grr-server/executables/installers
+    networks:
+      - grr
+    ports:
+      - "4444"
+      - "8080:8080"
+    env_file:
+      - ./test/frontend-keys.env
+    environment:
+      DISABLE_INTERNAL_MYSQL: 'true'
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE_NAME: grr
+      MYSQL_DATABASE_USERNAME: grr
+      MYSQL_DATABASE_PASSWORD: grr
+      MONITORING_HTTP_PORT: 4444
+      FRONTEND_SERVER_PORT: 8080
+      CLIENT_PACKING_FRONTEND_HOST: localhost
+      NO_CLIENT_UPLOAD: "true"
+
+      # Key management
+      SERVER_RSA_KEY_LENGTH: 2048
+
+  adminui:
+    depends_on: 
+      - mysql
+    build:
+      context: ./adminui
+    image: grr-adminui
+    container_name: grr-adminui
+    networks:
+      - grr
+    ports:
+        - "8443:443"
+    env_file:
+      - ./test/adminui-keys.env
+    environment:
+      EXTERNAL_HOSTNAME: "localhost"
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE_NAME: grr
+      MYSQL_DATABASE_USERNAME: grr
+      MYSQL_DATABASE_PASSWORD: grr
+      DISABLE_INTERNAL_MYSQL: 'true'
+      MONITORING_HTTP_PORT: 5222
+      ADMINUI_PORT: 443
+      ADMIN_USER: root
+      ADMIN_PASSWORD: root
