@@ -20,12 +20,12 @@ variable "client_installers_bucket_root" {
 
 variable "database_version" {
   description = "The version of MySQL that CloudSQL supports"
-  default = "MYSQL_5_7"
+  default     = "MYSQL_5_7"
 }
 
 variable "database_tier" {
   description = "Database deployment tier (machien type)"
-  default = "db-n1-standard-4"
+  default     = "db-n1-standard-4"
 }
 
 variable "storage_access_logs_bucket_name" {
@@ -38,7 +38,7 @@ variable "client_installers_bucket_name" {
 
 variable "gcs_bucket_location" {
   description = "Location of buckets to be created"
-  default = "US"
+  default     = "US"
 }
 
 resource "google_sql_database_instance" "grr_db" {
@@ -82,7 +82,7 @@ resource "random_string" "grr_user_password" {
 }
 
 resource "random_string" "database_name_suffix" {
-  length = 4
+  length  = 4
   special = false
 }
 
@@ -99,7 +99,7 @@ resource "google_storage_bucket" "access_logs" {
 
 resource "google_storage_bucket" "client_installers" {
   name          = "${var.client_installers_bucket_name}"
-  location = "${var.gcs_bucket_location}"
+  location      = "${var.gcs_bucket_location}"
   force_destroy = true
 
   logging {

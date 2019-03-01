@@ -33,7 +33,7 @@ variable "grr_worker_target_size" {
 
 variable "grr_worker_machine_type" {
   description = "The machine type to spawn for the worker instance group"
-  default = "n1-standard-1"
+  default     = "n1-standard-1"
 }
 
 module "grr_worker_container" {

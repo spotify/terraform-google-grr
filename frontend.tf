@@ -47,7 +47,7 @@ variable "grr_frontend_address" {
 
 variable "grr_frontend_machine_type" {
   description = "The machine type to spawn for the frontend instance group"
-  default = "n1-standard-1"
+  default     = "n1-standard-1"
 }
 
 module "grr_frontend_container" {
