@@ -71,8 +71,12 @@ variable "grr_adminui_encrypted_ssl_cert_key_path" {
   description = "File path to ciphertext for SSL certificate private key encrypted by the specified key in specified keyring"
 }
 
-variable "grr_adminui_public_ssl_cert_path" {
+variable "grr_adminui_ssl_cert_path" {
   description = "File path to public SSL certificate in PEM format"
+}
+
+variable "grr_adminui_ssl_cert_private_key" {
+  description = "The private key for the SSL in PEM format"
 }
 
 variable "_admin_ui_backend_service_name" {
@@ -311,34 +315,10 @@ resource "google_compute_health_check" "grr_adminui_loadbalancing_monitoring" {
   }
 }
 
-resource "google_kms_key_ring" "grr_keyring" {
-  project  = "${var.gce_project}"
-  name     = "${var.grr_adminui_keyring_name}"
-  location = "global"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "google_kms_crypto_key" "grr_crypto_key" {
-  name     = "${var.grr_adminui_key_name}"
-  key_ring = "${google_kms_key_ring.grr_keyring.id}"
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-data "google_kms_secret" "grr_adminui_ssl_certificate" {
-  crypto_key = "${google_kms_crypto_key.grr_crypto_key.id}"
-  ciphertext = "${base64encode(file("${var.grr_adminui_encrypted_ssl_cert_key_path}"))}"
-}
-
 resource "google_compute_ssl_certificate" "grr_adminui" {
   name        = "grr-adminui-certificate-${random_string.certificate_name_suffix.result}"
-  private_key = "${data.google_kms_secret.grr_adminui_ssl_certificate.plaintext}"
-  certificate = "${file("${var.grr_adminui_public_ssl_cert_path}")}"
+  private_key = "${var.grr_adminui_ssl_cert_private_key}"
+  certificate = "${file("${var.grr_adminui_ssl_cert_path}")}"
 
   lifecycle {
     create_before_destroy = true
