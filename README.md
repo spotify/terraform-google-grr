@@ -2,7 +2,7 @@
 Automatic creation of GRR infrastructure using GCP GCE, Container-Optimized OS, and Terraform.
 This module will:
 
-* Create instances groups with global load balancers for each GRR component
+* Create instance groups with global load balancers for each GRR component
 * Generate certificates for the internal GRR PKI
 * Set up GCE networking
 * Set up CloudSQL
