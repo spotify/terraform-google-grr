@@ -15,13 +15,10 @@ We also provide a docker-compose lab for local testing.
 
 # Prerequisites
 
-## Deployment
 * Google Cloud Platform credentials [configured](https://cloud.google.com/docs/authentication/) for use with Terraform
 * SSL certificate and private key in PEM format
 * Google managed [DNS zone](https://cloud.google.com/dns/docs/)
 * Configured [IAP Client](https://cloud.google.com/iap/docs/enabling-compute-howto)
-
-## Testing
 * Docker
 * OpenSSL
 
