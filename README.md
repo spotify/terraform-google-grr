@@ -1,0 +1,128 @@
+# grr-gce
+Automatic creation of GRR infrastructure using GCP GCE, Container-Optimized OS, and Terraform.
+This module will:
+
+* 
+
+# Prerequisites
+
+## Deployment
+* Google Cloud Platform credentials [configured](https://cloud.google.com/docs/authentication/) for use with Terraform
+* SSL certificate and private key in PEM format
+* Google managed [DNS zone](https://cloud.google.com/dns/docs/)
+* Configured [IAP Client](https://cloud.google.com/iap/docs/enabling-compute-howto)
+
+## Testing
+* Docker
+* OpenSSL
+
+# Configuration
+## Terraform
+### General
+
+#### Variables
+
+| Name | Description | Required | Default |
+| - | - | - | - |
+|`gce_project` | GCP project name | Yes | 
+|`gce_project_id` | GCP project id | Yes | 
+|`gce_region` | GCE region where `gce_project` is located | Yes |
+|`dns_zone_name` | Name of Google managed DNS zone where DNS records should be created | Yes |
+|`dns_zone_fqdn`| FQDN of `dns_zone_name` zone | Yes |
+|`dns_default_ttl` | Default TTL for DNS records in seconds | No | 300 |
+|`database_version` | Version of MySQL that CloudSQL supports | No | `MySQL_5_7` | 
+|`database_tier` | Database deployment tier | No | `db-n1-standard-4` |
+
+#### Outputs
+| Name | Description |
+| - | - |
+|`grr_db_ip` | IPv4 address of the MySQL instance created |
+|`grr_db_user` | Username for provisioned grr database user |
+|`grr_db_user_password` | Password generated for the provisioned grr database user |
+
+
+### Frontend
+
+#### Variables
+| Name | Description | Required | Default |
+| - | - | - | - |
+|`grr_frontend_image` | Base docker image to use for the GRR frontend component | Yes |
+|`grr_frontend_image_tag` | Image tag to pull for the image specified by `grr_frontend_image` | Yes |
+|`grr_frontend_address` | Hostname/address that GRR clients will reach out to. Needs to match DNS record | Yes | 
+|`frontend_cn` | CN to use for frontend PKI certificate | Yes | 
+|`grr_ca_cn` | CN to use for internal PKI CA certificate | Yes |
+|`grr_ca_country` | Country to use for internal PKI CA Certificate | Yes |
+|`grr_ca_org` | Organization to use for internal PKI CA Certificate | Yes |
+|`client_installers_bucket_name` | Name of GCS bucket that where generated GRR client installers will be uploaded | Yes |
+|`storage_access_logs_bucket_name` | Name of GCS bucket where access logs for `client_installers_bucket_name` will be stored | Yes |
+|`gcs_bucket_location` |  Location of GCS buckets to be created | No | `US` |
+|`client_installers_bucket_root` | Root directory where GRR client installers should be uploaded within `client_installers_bucket_name` | No | `installers`
+|`grr_frontend_port` | Port that GRR clients will connnect to. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/).  | No | 443 |
+|`grr_frontend_monitoring_port` | Port for localized monitoring stats server. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/). | No | 5222 |
+|`grr_frontend_network_tag` | Firewall network tag to open oprts for GRR frontend | No | `grr-frontend` | 
+|`grr_frontend_target_size` | Number of GRR frontend instances that should always be running" | No | 3 |
+|`grr_frontend_machine_type` | GCE Machine type to spawn for frontend instance group | No | `n1-standard-1` |
+|`grr_frontend_rsa_key_length` | Not used | No | 2048 |
+
+#### Outputs 
+
+| Name | Description |
+| - | - |
+| `client_fingerprint` | Fingerprint given to generated client installer for this specific frontend configuration | 
+| `frontend_lb_address` | IPv4 address of global load balancer for frontend group |
+| `frontend_fqdn` | FQDN for the DNS record pointing at the `frontend_lb_address` |
+
+
+### AdminUI
+
+#### Variables
+| Name | Description | Required | Default |
+| - | - | - | - |
+|`grr_adminui_image` | Base docker image to use for the GRR adminui component | Yes |
+|`grr_adminui_image_tag` | Image tag to pull for the image specified by `grr_adminui_image` | Yes |
+|`grr_adminui_iap_client_id` | OAuth2 Client id for the IAP client credential | Yes |
+|`grr_adminui_iap_client_secret` | OAuth2 Client secret for the IAP client credential | Yes |
+|`grr_adminui_external_hostame` | Hostname that users will access the GRR UI from, which matches DNS record | Yes |
+|`grr_adminui_ssl_cert_path` | Filepath to the SSL cert in PEM format to be installed on the UI HTTPS Load Balancer | Yes |
+|`grr_adminui_ssl_cert_private_key` | Private key for the SSL cert specified in `grr_adminui_ssl_cert_path` in PEM format. **Do not store this in plain text!** | Yes |
+|`grr_adminui_port` | Port that clients will connect to. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/).| No | 443 |
+|`grr_adminui_monitoring_port` | Port for localized monitoring stats server. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/). | No | 5222 |
+|`grr_adminui_network_tag` | Firewall network tag to open oprts for GRR frontend | No | `grr-adminui` | 
+|`grr_adminui_target_size` | Number of GRR adminui instances that should always be running" | No | 2 |
+|`grr_adminui_machine_type` | GCE Machine type to spawn for adminui instance group | No | `n1-standard-1` |
+
+#### Outputs
+| Name | Description |
+| - | - |
+|`lb_address` | IPv4 address of global load balancer for adminui group |
+|`grr_user` | Username of generated root grr user |
+|`grr_password | Password of generated root grr user |
+
+
+### Worker
+
+#### Variables
+
+| Name | Description | Required | Default |
+| - | - | - | - |
+|`grr_worker_image` | Base docker image to use for the GRR worker component | Yes |
+|`grr_worker_image_tag` | Image tag to pull for the image specified by `grr_worker_image` | Yes |
+|`grr_worker_target_size` | Number of GRR adminui instances that should always be running" | No | 5 |
+|`grr_worker_machine_type` | GCE Machine type to spawn for adminui instance group | No | `n1-standard-1` |
+|`grr_worker_monitoring_port` | Port for localized monitoring stats server. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/). | No | 5222 |
+
+## Environment variables
+### Frontend
+### Worker
+### AdminUI
+
+## Certificate Management
+## User Management
+## SSH Management
+
+## Docker Image Creation
+
+# Local testing
+## 
+## Certificate generation
+## Mac client Installation
