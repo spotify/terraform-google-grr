@@ -2,7 +2,16 @@
 Automatic creation of GRR infrastructure using GCP GCE, Container-Optimized OS, and Terraform.
 This module will:
 
-* 
+* Create instances groups with global load balancers for each GRR component
+* Generate certificates for the internal GRR PKI
+* Set up GCE networking
+* Set up CloudSQL
+* Set up DNS records within your managed zone
+* Hook in Identity Aware Proxy
+* Generate new client installers and upload them to your GCS bucket
+
+We also provide a docker-compose lab for local testing. 
+
 
 # Prerequisites
 
@@ -46,7 +55,7 @@ This module will:
 #### Variables
 | Name | Description | Required | Default |
 | - | - | - | - |
-|`grr_frontend_image` | Base docker image to use for the GRR frontend component | Yes |
+|`grr_frontend_image` | Base docker image to use for the GRR frontend component created by the process detailed in this README | Yes |
 |`grr_frontend_image_tag` | Image tag to pull for the image specified by `grr_frontend_image` | Yes |
 |`grr_frontend_address` | Hostname/address that GRR clients will reach out to. Needs to match DNS record | Yes | 
 |`frontend_cn` | CN to use for frontend PKI certificate | Yes | 
@@ -78,7 +87,7 @@ This module will:
 #### Variables
 | Name | Description | Required | Default |
 | - | - | - | - |
-|`grr_adminui_image` | Base docker image to use for the GRR adminui component | Yes |
+|`grr_adminui_image` | Base docker image to use for the GRR adminui component created by the process detailed in this README| Yes |
 |`grr_adminui_image_tag` | Image tag to pull for the image specified by `grr_adminui_image` | Yes |
 |`grr_adminui_iap_client_id` | OAuth2 Client id for the IAP client credential | Yes |
 |`grr_adminui_iap_client_secret` | OAuth2 Client secret for the IAP client credential | Yes |
@@ -96,7 +105,7 @@ This module will:
 | - | - |
 |`lb_address` | IPv4 address of global load balancer for adminui group |
 |`grr_user` | Username of generated root grr user |
-|`grr_password | Password of generated root grr user |
+|`grr_password` | Password of generated root grr user |
 
 
 ### Worker
@@ -105,24 +114,39 @@ This module will:
 
 | Name | Description | Required | Default |
 | - | - | - | - |
-|`grr_worker_image` | Base docker image to use for the GRR worker component | Yes |
+|`grr_worker_image` | Base docker image to use for the GRR worker component created by the process detailed in this README | Yes |
 |`grr_worker_image_tag` | Image tag to pull for the image specified by `grr_worker_image` | Yes |
 |`grr_worker_target_size` | Number of GRR adminui instances that should always be running" | No | 5 |
 |`grr_worker_machine_type` | GCE Machine type to spawn for adminui instance group | No | `n1-standard-1` |
 |`grr_worker_monitoring_port` | Port for localized monitoring stats server. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/). | No | 5222 |
 
-## Environment variables
-### Frontend
-### Worker
-### AdminUI
-
-## Certificate Management
 ## User Management
+
+This module utilizes Google's [Identity Aware Proxy](https://cloud.google.com/iap/docs/enabling-compute-howto), which allows you to lock down access to an application by using Google identities. After your GRR cluster is created, you must grant the appropriate IAM permissions for each principle you would like to grant access to the UI. 
+
 ## SSH Management
+This module enables OSLogin, which allows you to manage SSH access and root privledges using Google identities and IAM. SSH is to these instance is locked down by default. Consult the [documentation](https://cloud.google.com/compute/docs/instances/managing-instance-access#configure_users) to learn how to manage access.
 
 ## Docker Image Creation
+This module was tested with a snapshot of `grrdocker/grr:latest`, which was at version `v3.2.4.7`. The current dockerfiles use `latest` as a base, which is constantly being updated and may introduce breaking changes. We intend to pin this base image when `v3.2.4.7` is pinned on for the `grrdocker/grr` [Docker Hub repository](https://hub.docker.com/r/grrdocker/grr/). 
+
+To create an image suitable for deployment:
+
+1. Change the `image` keys in the `docker-compose.yaml` definition to the full qualified image name that you intend to roll out for deployment. This needs to be for a repository that your GCE instances have access to.
+1. Run `docker-compose build`
+1. Run `docker push <image>` for each of the newly built images
+1. Update the `grr_<adminui|worker|frontend>_image` and `grr_<adminui|worker|frontend>_image_tag` terraform variables as necessary
+1. Run a `terraform plan`, confirm correctness, and `terraform apply`
 
 # Local testing
-## 
-## Certificate generation
-## Mac client Installation
+## Local lab
+We provide a `docker-compose.yaml`, which orchestrates the creation of a local MySQL instance, GRR components, and appropriate bind mounts for placing newly generated client installers.
+
+1. Run `docker-compose up`
+1. Access the AdminUI at `http://localhost:8443`
+1. Username and password is `root:root`
+
+Client installers will be generated and placed in `test/installers`. Utility scripts are provided in `test/scripts` for:
+
+* Local macOS client installation/uninstallation
+* Testing certificate rotation
