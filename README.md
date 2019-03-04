@@ -122,7 +122,7 @@ We also provide a docker-compose lab for local testing.
 This module utilizes Google's [Identity Aware Proxy](https://cloud.google.com/iap/docs/enabling-compute-howto), which allows you to lock down access to an application by using Google identities. After your GRR cluster is created, you must grant the appropriate IAM permissions for each principle you would like to grant access to the UI. 
 
 ## SSH Management
-This module enables OSLogin, which allows you to manage SSH access and root privledges using Google identities and IAM. SSH is to these instance is locked down by default. Consult the [documentation](https://cloud.google.com/compute/docs/instances/managing-instance-access#configure_users) to learn how to manage access.
+This module enables OSLogin, which allows you to manage SSH access and root privileges using Google identities and IAM. SSH to these instance is locked down by default. Consult the [documentation](https://cloud.google.com/compute/docs/instances/managing-instance-access#configure_users) to learn how to manage access.
 
 ## Docker Image Creation
 This module was tested with a snapshot of `grrdocker/grr:latest`, which was at version `v3.2.4.7`. The current dockerfiles use `latest` as a base, which is constantly being updated and may introduce breaking changes. We intend to pin this base image when `v3.2.4.7` is pinned on for the `grrdocker/grr` [Docker Hub repository](https://hub.docker.com/r/grrdocker/grr/). 
