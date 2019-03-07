@@ -1,4 +1,7 @@
 # grr-gce
+
+GRR is an incident response framework that allows responders to conduct remote forensics such as remote memory acquisition, artifact investigation, and binary uploads. GRR is managed by google [here](https://github.com/google/grr).
+
 Automatic creation of GRR infrastructure using GCP GCE, Container-Optimized OS, and Terraform.
 This module will:
 
@@ -12,6 +15,7 @@ This module will:
 
 We also provide a docker-compose lab for local testing. 
 
+This project adheres to the [Open Code of Conduct](https://github.com/spotify/code-of-conduct). By participating, you are expected to honor this code.
 
 # Prerequisites
 
