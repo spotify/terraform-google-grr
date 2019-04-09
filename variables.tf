@@ -11,10 +11,6 @@ variable "gce_project" {
   description = "Project name to deploy assests to"
 }
 
-variable "gce_project_id" {
-  description = "Project id for project specified in $gce_project"
-}
-
 variable "grr_frontend_port" {
   description = "GRR frontend port that clients will connect to"
   default     = 443
