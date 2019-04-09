@@ -1,11 +1,11 @@
 #  Copyright 2018-2019 Spotify AB.
-#  
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#  
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-#  
+#
 #  Unless required by applicable law or agreed to in writing,
 #  software distributed under the License is distributed on an
 #  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -21,28 +21,9 @@ variable "grr_frontend_image_tag" {
   description = "Docker image tag to pull of image specified by grr_frontend_image"
 }
 
-variable "grr_frontend_port" {
-  description = "GRR frontend port that clients will connect to"
-  default     = 443
-}
-
-variable "grr_frontend_monitoring_port" {
-  description = "GRR frontend monitoring stats port"
-  default     = 5222
-}
-
-variable "grr_frontend_network_tag" {
-  description = "Firewall network tag to open ports for GRR frontend"
-  default     = "grr-frontend"
-}
-
 variable "grr_frontend_target_size" {
   description = "The number of GRR Frontend instances that should always be running"
   default     = 3
-}
-
-variable "grr_frontend_address" {
-  description = "The GRR frontend address. Needs to match the configured DNS record"
 }
 
 variable "grr_frontend_machine_type" {
