@@ -79,7 +79,3 @@ resource "google_compute_firewall" "grr_frontend" {
 
   target_tags = ["${var.grr_frontend_network_tag}"]
 }
-
-output "frontend_lb_address" {
-  value = "${google_compute_global_address.grr_frontend_lb.address}"
-}

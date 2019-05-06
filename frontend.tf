@@ -13,24 +13,6 @@
 #  specific language governing permissions and limitations
 #  under the License.
 
-variable "grr_frontend_image" {
-  description = "Docker image to run for GRR frontend"
-}
-
-variable "grr_frontend_image_tag" {
-  description = "Docker image tag to pull of image specified by grr_frontend_image"
-}
-
-variable "grr_frontend_target_size" {
-  description = "The number of GRR Frontend instances that should always be running"
-  default     = 3
-}
-
-variable "grr_frontend_machine_type" {
-  description = "The machine type to spawn for the frontend instance group"
-  default     = "n1-standard-1"
-}
-
 module "grr_frontend_container" {
   # Pin module for build determinism
   source = "github.com/terraform-google-modules/terraform-google-container-vm?ref=f299e4c3b13a987482f830489222006ef85075ed"
@@ -294,8 +276,4 @@ resource "google_compute_backend_service" "grr_frontend_monitoring" {
   backend {
     group = "${google_compute_instance_group_manager.grr_frontends.instance_group}"
   }
-}
-
-output "client_fingerprint" {
-  value = "${random_id.client_installer_fingerprint.dec}"
 }

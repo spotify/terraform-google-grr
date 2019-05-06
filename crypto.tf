@@ -13,26 +13,6 @@
 #  specific language governing permissions and limitations
 #  under the License.
 
-variable "grr_ca_cn" {
-  description = "Common name for internal CA"
-}
-
-variable "frontend_cn" {
-  description = "Common name to use frotend certificate"
-}
-
-variable "grr_ca_org" {
-  description = "Organization for internal CA"
-}
-
-variable "grr_ca_country" {
-  description = "Country for internal CA"
-}
-
-variable "frontend_rsa_key_length" {
-  default = 2048
-}
-
 data "tls_public_key" "frontend_executable_signing" {
   private_key_pem = "${tls_private_key.frontend_executable_signing.private_key_pem}"
 }

@@ -13,29 +13,6 @@
 #  specific language governing permissions and limitations
 #  under the License.
 
-variable "database_version" {
-  description = "The version of MySQL that CloudSQL supports"
-  default     = "MYSQL_5_7"
-}
-
-variable "database_tier" {
-  description = "Database deployment tier (machien type)"
-  default     = "db-n1-standard-4"
-}
-
-variable "storage_access_logs_bucket_name" {
-  description = "Name of the GCS bucket that will store access logs. Needs to be globally unique"
-}
-
-variable "client_installers_bucket_name" {
-  description = "Name of the GCS bucket that will store generated grr client installers. Needs to be globally unique"
-}
-
-variable "gcs_bucket_location" {
-  description = "Location of buckets to be created"
-  default     = "US"
-}
-
 resource "google_sql_database_instance" "grr_db" {
   name             = "grr-db-instance-${random_string.database_name_suffix.result}"
   region           = "${var.gce_region}"
@@ -100,21 +77,4 @@ resource "google_storage_bucket" "client_installers" {
   logging {
     log_bucket = "${google_storage_bucket.access_logs.name}"
   }
-}
-
-output "grr_db_ip" {
-  value = "${google_sql_database_instance.grr_db.ip_address.0.ip_address}"
-}
-
-output "grr_db_user" {
-  value = "${google_sql_user.grr_user.name}"
-}
-
-output "grr_db_user_password" {
-  value     = "${random_string.grr_user_password.result}"
-  sensitive = true
-}
-
-output "grr_client_installers_bucket" {
-  value = "${google_storage_bucket.client_installers.name}"
 }

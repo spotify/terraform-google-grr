@@ -13,29 +13,6 @@
 #  specific language governing permissions and limitations
 #  under the License.
 
-variable "grr_worker_image" {
-  description = "Docker image to run for GRR worker"
-}
-
-variable "grr_worker_image_tag" {
-  description = "Docker image tag to pull of image specified by grr_worker_image"
-}
-
-variable "grr_worker_monitoring_port" {
-  description = "GRR worker monitoring stats port"
-  default     = 5222
-}
-
-variable "grr_worker_target_size" {
-  description = "The number of GRR worker instances that should always be running"
-  default     = 5
-}
-
-variable "grr_worker_machine_type" {
-  description = "The machine type to spawn for the worker instance group"
-  default     = "n1-standard-1"
-}
-
 module "grr_worker_container" {
   # Pin module for build determinism
   source = "github.com/terraform-google-modules/terraform-google-container-vm?ref=f299e4c3b13a987482f830489222006ef85075ed"
