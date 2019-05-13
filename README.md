@@ -14,7 +14,7 @@ This module will:
 * Hook in Identity Aware Proxy
 * Generate new client installers and upload them to your GCS bucket
 
-We also provide a docker-compose lab for local testing. 
+We also provide a docker-compose lab for local testing.
 
 This project adheres to the [Open Code of Conduct](https://github.com/spotify/code-of-conduct). By participating, you are expected to honor this code.
 
@@ -44,13 +44,13 @@ Client installers will be generated and placed in `test/installers`. Utility scr
 
 ## User Management
 
-This module utilizes Google's [Identity Aware Proxy](https://cloud.google.com/iap/docs/enabling-compute-howto), which allows you to lock down access to an application by using Google identities. After your GRR cluster is created, you must grant the appropriate IAM permissions for each principle you would like to grant access to the UI. 
+This module utilizes Google's [Identity Aware Proxy](https://cloud.google.com/iap/docs/enabling-compute-howto), which allows you to lock down access to an application by using Google identities. After your GRR cluster is created, you must grant the appropriate IAM permissions for each principle you would like to grant access to the UI.
 
 ## SSH Management
 This module enables OSLogin, which allows you to manage SSH access and root privileges using Google identities and IAM. SSH to these instance is locked down by default. Consult the [documentation](https://cloud.google.com/compute/docs/instances/managing-instance-access#configure_users) to learn how to manage access.
 
 ## Docker Image Creation
-This module was tested with a snapshot of `grrdocker/grr:latest`, which was at version `v3.2.4.7`. The current dockerfiles use `latest` as a base, which is constantly being updated and may introduce breaking changes. We intend to pin this base image when `v3.2.4.7` is pinned on for the `grrdocker/grr` [Docker Hub repository](https://hub.docker.com/r/grrdocker/grr/). 
+This module was tested with a snapshot of `grrdocker/grr:latest`, which was at version `v3.2.4.7`. The current dockerfiles use `latest` as a base, which is constantly being updated and may introduce breaking changes. We intend to pin this base image when `v3.2.4.7` is pinned on for the `grrdocker/grr` [Docker Hub repository](https://hub.docker.com/r/grrdocker/grr/).
 
 To create an image suitable for deployment:
 
@@ -67,13 +67,13 @@ To create an image suitable for deployment:
 
 | Name | Description | Required | Default |
 | - | - | - | - |
-|`gce_project` | GCP project name | Yes | 
-|`gce_project_id` | GCP project id | Yes | 
+|`gce_project` | GCP project name | Yes |
+|`gce_project_id` | GCP project id | Yes |
 |`gce_region` | GCE region where `gce_project` is located | Yes |
 |`dns_zone_name` | Name of Google managed DNS zone where DNS records should be created | Yes |
 |`dns_zone_fqdn`| FQDN of `dns_zone_name` zone | Yes |
 |`dns_default_ttl` | Default TTL for DNS records in seconds | No | 300 |
-|`database_version` | Version of MySQL that CloudSQL supports | No | `MySQL_5_7` | 
+|`database_version` | Version of MySQL that CloudSQL supports | No | `MySQL_5_7` |
 |`database_tier` | Database deployment tier | No | `db-n1-standard-4` |
 
 #### Outputs
@@ -90,8 +90,8 @@ To create an image suitable for deployment:
 | - | - | - | - |
 |`grr_frontend_image` | Base docker image to use for the GRR frontend component created by the process detailed in this README | Yes |
 |`grr_frontend_image_tag` | Image tag to pull for the image specified by `grr_frontend_image` | Yes |
-|`grr_frontend_address` | Hostname/address that GRR clients will reach out to. Needs to match DNS record | Yes | 
-|`frontend_cn` | CN to use for frontend PKI certificate | Yes | 
+|`grr_frontend_address` | Hostname/address that GRR clients will reach out to. Needs to match DNS record | Yes |
+|`frontend_cn` | CN to use for frontend PKI certificate | Yes |
 |`grr_ca_cn` | CN to use for internal PKI CA certificate | Yes |
 |`grr_ca_country` | Country to use for internal PKI CA Certificate | Yes |
 |`grr_ca_org` | Organization to use for internal PKI CA Certificate | Yes |
@@ -101,16 +101,16 @@ To create an image suitable for deployment:
 |`client_installers_bucket_root` | Root directory where GRR client installers should be uploaded within `client_installers_bucket_name` | No | `installers`
 |`grr_frontend_port` | Port that GRR clients will connnect to. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/).  | No | 443 |
 |`grr_frontend_monitoring_port` | Port for localized monitoring stats server. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/). | No | 5222 |
-|`grr_frontend_network_tag` | Firewall network tag to open oprts for GRR frontend | No | `grr-frontend` | 
+|`grr_frontend_network_tag` | Firewall network tag to open oprts for GRR frontend | No | `grr-frontend` |
 |`grr_frontend_target_size` | Number of GRR frontend instances that should always be running" | No | 3 |
 |`grr_frontend_machine_type` | GCE Machine type to spawn for frontend instance group | No | `n1-standard-1` |
 |`grr_frontend_rsa_key_length` | Not used | No | 2048 |
 
-#### Outputs 
+#### Outputs
 
 | Name | Description |
 | - | - |
-| `client_fingerprint` | Fingerprint given to generated client installer for this specific frontend configuration | 
+| `client_fingerprint` | Fingerprint given to generated client installer for this specific frontend configuration |
 | `frontend_lb_address` | IPv4 address of global load balancer for frontend group |
 | `frontend_fqdn` | FQDN for the DNS record pointing at the `frontend_lb_address` |
 
@@ -128,7 +128,7 @@ To create an image suitable for deployment:
 |`grr_adminui_ssl_cert_private_key` | Private key for the SSL cert specified in `grr_adminui_ssl_cert_path` in PEM format. **Do not store this in plain text!** | Yes |
 |`grr_adminui_port` | Port that clients will connect to. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/).| No | 443 |
 |`grr_adminui_monitoring_port` | Port for localized monitoring stats server. Needs to be an [accepted TCP port](https://cloud.google.com/load-balancing/docs/tcp/). | No | 5222 |
-|`grr_adminui_network_tag` | Firewall network tag to open oprts for GRR frontend | No | `grr-adminui` | 
+|`grr_adminui_network_tag` | Firewall network tag to open oprts for GRR frontend | No | `grr-adminui` |
 |`grr_adminui_target_size` | Number of GRR adminui instances that should always be running" | No | 2 |
 |`grr_adminui_machine_type` | GCE Machine type to spawn for adminui instance group | No | `n1-standard-1` |
 

@@ -1,88 +1,17 @@
 #  Copyright 2018-2019 Spotify AB.
-#  
+#
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
-#  
+#
 #      http://www.apache.org/licenses/LICENSE-2.0
-#  
+#
 #  Unless required by applicable law or agreed to in writing,
 #  software distributed under the License is distributed on an
 #  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 #  KIND, either express or implied.  See the License for the
 #  specific language governing permissions and limitations
 #  under the License.
-
-variable "grr_adminui_image" {
-  description = "Docker image to run for GRR adminui"
-}
-
-variable "grr_adminui_image_tag" {
-  description = "Docker image tag to pull of image specified by grr_adminui_image"
-}
-
-variable "grr_adminui_port" {
-  description = "GRR AdminUI port that clients will connect to"
-  default     = 443
-}
-
-variable "grr_adminui_monitoring_port" {
-  description = "GRR AdminUI monitoring stats port"
-  default     = 5222
-}
-
-variable "grr_adminui_network_tag" {
-  description = "Firewall network tag to open ports for GRR admin UI"
-  default     = "grr-adminui"
-}
-
-variable "grr_adminui_target_size" {
-  description = "The number of GRR AdminUI instances that should always be running"
-  default     = 2
-}
-
-variable "grr_adminui_iap_client_id" {
-  description = "The OAuth2 Client id for the previously set up IAP Credential"
-}
-
-variable "grr_adminui_iap_client_secret" {
-  # We rely on the redirect_uri being hard to compromise and accept the risk of client secret leaking
-  description = "The OAuth2 Client secret for the previously set up IAP Credential"
-}
-
-variable "grr_adminui_machine_type" {
-  description = "The machine type to spawn for the adminui instance group"
-  default     = "n1-standard-1"
-}
-
-variable "grr_adminui_external_hostname" {
-  description = "This is the hostname that users will access the GRR AdminUI from. Usually the DNS name configured."
-}
-
-variable "grr_adminui_keyring_name" {
-  description = "The name of the GKS keyring that houses the key used to encrypt SSL certificate"
-}
-
-variable "grr_adminui_key_name" {
-  description = "The name of the key wihtin the specified keyring that was used to ecnrypt SSL certificate"
-}
-
-variable "grr_adminui_encrypted_ssl_cert_key_path" {
-  description = "File path to ciphertext for SSL certificate private key encrypted by the specified key in specified keyring"
-}
-
-variable "grr_adminui_ssl_cert_path" {
-  description = "File path to public SSL certificate in PEM format"
-}
-
-variable "grr_adminui_ssl_cert_private_key" {
-  description = "The private key for the SSL in PEM format"
-}
-
-variable "_admin_ui_backend_service_name" {
-  description = "Needed to break dependency cycle. Do not change."
-  default     = "grr-adminui"
-}
 
 resource "random_string" "grr_adminui_password" {
   # Make the password extra hot
@@ -92,11 +21,6 @@ resource "random_string" "grr_adminui_password" {
   min_lower   = 8
   min_numeric = 8
   min_special = 8
-}
-
-variable "grr_adminui_username" {
-  description = "The GRR adminUI username"
-  default     = "root"
 }
 
 module "grr_adminui_container" {
@@ -173,7 +97,7 @@ module "grr_adminui_container" {
       },
       {
         name  = "CLOUD_PROJECT_ID"
-        value = "${var.gce_project_id}"
+        value = "${data.google_project.project.project_id}"
       },
       {
         name  = "CLOUD_PROJECT_NAME"
@@ -408,16 +332,4 @@ resource "google_compute_backend_bucket" "client_installers" {
   name        = "client-installers"
   bucket_name = "${google_storage_bucket.client_installers.name}"
   description = "Managed by Terraform. DO NOT EDIT. Serves client installers behind https load balancer"
-}
-
-output "lb_address" {
-  value = "${google_compute_global_address.grr_adminui_lb.address}"
-}
-
-output "grr_user" {
-  value = "${var.grr_adminui_username}"
-}
-
-output "grr_password" {
-  value = "${random_string.grr_adminui_password.result}"
 }
