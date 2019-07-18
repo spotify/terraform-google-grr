@@ -84,18 +84,6 @@ variable "grr_adminui_key_name" {
   description = "The name of the key wihtin the specified keyring that was used to ecnrypt SSL certificate"
 }
 
-variable "grr_adminui_encrypted_ssl_cert_key_path" {
-  description = "File path to ciphertext for SSL certificate private key encrypted by the specified key in specified keyring"
-}
-
-variable "grr_adminui_ssl_cert_path" {
-  description = "File path to public SSL certificate in PEM format"
-}
-
-variable "grr_adminui_ssl_cert_private_key" {
-  description = "The private key for the SSL in PEM format"
-}
-
 variable "_admin_ui_backend_service_name" {
   description = "Needed to break dependency cycle. Do not change."
   default     = "grr-adminui"
