@@ -76,12 +76,12 @@ variable "grr_adminui_external_hostname" {
   description = "This is the hostname that users will access the GRR AdminUI from. Usually the DNS name configured."
 }
 
-variable "grr_adminui_keyring_name" {
-  description = "The name of the GKS keyring that houses the key used to encrypt SSL certificate"
-}
+ variable "grr_adminui_ssl_cert_path" {	
+  description = "File path to public SSL certificate in PEM format"	
+}	
 
-variable "grr_adminui_key_name" {
-  description = "The name of the key wihtin the specified keyring that was used to ecnrypt SSL certificate"
+ variable "grr_adminui_ssl_cert_private_key" {	
+  description = "The private key for the SSL in PEM format"	
 }
 
 variable "_admin_ui_backend_service_name" {
