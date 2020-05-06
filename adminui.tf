@@ -97,7 +97,7 @@ module "grr_adminui_container" {
       },
       {
         name  = "CLOUD_PROJECT_ID"
-        value = "${data.google_project.project.project_id}"
+        value = "${data.google_project.project.number}"
       },
       {
         name  = "CLOUD_PROJECT_NAME"
